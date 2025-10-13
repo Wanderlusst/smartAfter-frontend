@@ -74,9 +74,13 @@ const Landing = () => {
     try {
       console.log('🔐 Starting Google OAuth authentication...');
       
+      // Get callback URL from query params
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
+      
       // Force fresh authentication with proper scopes
       const result = await signIn('google', { 
-        callbackUrl: '/dashboard',
+        callbackUrl: callbackUrl,
         redirect: false
       });
 
@@ -87,8 +91,8 @@ const Landing = () => {
         setError(`Authentication failed: ${result.error}`);
         
       } else if (result?.ok) {
-        console.log('✅ Authentication successful, redirecting to dashboard');
-        router.push('/dashboard');
+        console.log('✅ Authentication successful, redirecting to:', callbackUrl);
+        router.push(callbackUrl);
       } else {
         console.log('⚠️ Authentication result unclear:', result);
         setError('Authentication response unclear. Please try again.');
@@ -119,7 +123,18 @@ const Landing = () => {
   // Handle redirect to dashboard when authenticated
   useEffect(() => {
     if (session && status === 'authenticated') {
-      router.push('/dashboard');
+      // Get callback URL from query params
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
+      
+      console.log('🔄 Redirecting authenticated user to:', callbackUrl);
+      
+      // Add a small delay to prevent race conditions
+      const redirectTimer = setTimeout(() => {
+        router.push(callbackUrl);
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [session, status, router]);
 

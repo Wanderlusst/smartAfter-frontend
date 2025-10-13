@@ -3,10 +3,6 @@ import { NextResponse } from 'next/server';
 
 export default withAuth(
   function middleware(req) {
-
-    const protectedRoutes = ['/dashboard', '/purchases', '/refunds', '/warranties', '/documents', '/settings'];
-    const isProtectedRoute = protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route));
-    
     // Allow access to public routes
     const publicRoutes = ['/', '/landing', '/pricing', '/api/auth'];
     const isPublicRoute = publicRoutes.some(route => req.nextUrl.pathname.startsWith(route));
@@ -16,9 +12,14 @@ export default withAuth(
     }
     
     // For protected routes, ensure user has valid authentication
+    const protectedRoutes = ['/dashboard', '/purchases', '/refunds', '/warranties', '/documents', '/settings'];
+    const isProtectedRoute = protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route));
+    
     if (isProtectedRoute) {
       if (!req.nextauth.token || !req.nextauth.token.email) {
-        return NextResponse.redirect(new URL('/landing', req.url));
+        // Redirect to landing with callback URL
+        const callbackUrl = req.nextUrl.pathname + req.nextUrl.search;
+        return NextResponse.redirect(new URL(`/landing?callbackUrl=${encodeURIComponent(callbackUrl)}`, req.url));
       }
     }
     
@@ -27,13 +28,7 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        const protectedRoutes = ['/dashboard', '/purchases', '/refunds', '/warranties', '/documents', '/settings'];
-        const isProtectedRoute = protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route));
-        
-        if (isProtectedRoute) {
-          return !!token && !!token.email;
-        }
-        
+        // Allow all requests to pass through, we'll handle redirects in the middleware function
         return true;
       },
     },
@@ -50,7 +45,8 @@ export const config = {
     '/warranties/:path*',
     '/documents/:path*',
     '/settings/:path*',
-    // Also run on root to handle redirects
+    // Also run on root and landing to handle redirects
     '/',
+    '/landing',
   ],
 };
