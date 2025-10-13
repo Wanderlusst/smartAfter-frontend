@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    const backendUrl = process.env.PDF_PARSER_BACKEND_URL || 'https://smartafter-backend-1.onrender.com';
+    
     // Test if backend is receiving requests
-    const response = await fetch('http://localhost:8000/');
+    const response = await fetch(`${backendUrl}/health`);
     const backendStatus = await response.json();
     
     // Test email processing
-    const testEmailResponse = await fetch('http://localhost:8000/process-email-data', {
+    const testEmailResponse = await fetch(`${backendUrl}/process-email-data`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
