@@ -1,290 +1,198 @@
-# SmartAfter - PDF Warranty Analysis System
+# SmartAfter - Intelligent Purchase Management System
 
-A comprehensive full-stack application for analyzing PDF documents and extracting warranty information with intelligent insights and recommendations.
+A comprehensive solution for automatically organizing receipts, tracking returns, and managing warranties from your email.
 
-## 🏗️ Architecture
+## 🏗️ Architecture Overview
 
-```
-smartAf-nextjs/
-├── smartafter-next/          # Next.js Frontend
-│   ├── app/
-│   │   ├── api/pdf-parser/   # API routes for PDF processing
-│   │   ├── components/       # React components
-│   │   ├── lib/             # Utility libraries
-│   │   └── pdf-analyzer/    # PDF analyzer page
-│   └── ...
-├── pdf-parser-backend/       # Python FastAPI Backend
-│   ├── main.py              # FastAPI application
-│   ├── pdf_parser.py        # PDF parsing logic
-│   ├── data_extractor.py    # Data extraction & analysis
-│   ├── models.py            # Pydantic models
-│   └── ...
-└── start-dev.sh             # Development startup script
-```
+### Frontend Repository
+- **Repository**: [Wanderlusst/smartAfter-frontend](https://github.com/Wanderlusst/smartAfter-frontend)
+- **Deployment**: [smart-after-frontend.vercel.app](https://smart-after-frontend.vercel.app)
+- **Platform**: Vercel
+- **Framework**: Next.js 15 with TypeScript
+- **Status**: ✅ Live
+
+### Backend Repository  
+- **Repository**: [Wanderlusst/prod-smartAfter](https://github.com/Wanderlusst/prod-smartAfter)
+- **Deployment**: [pdf-parser-backend.onrender.com](https://pdf-parser-backend.onrender.com)
+- **Platform**: Render
+- **Framework**: Python FastAPI
+- **Status**: ✅ Live
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- **Node.js** 18+ and npm
-- **Python** 3.8+
-- **Git**
-
-### One-Command Setup
+### Frontend (Next.js)
 ```bash
-# Clone and start everything
-git clone <repository-url>
-cd smartAf-nextjs
-chmod +x start-dev.sh
-./start-dev.sh
-```
+# Clone the frontend repository
+git clone https://github.com/Wanderlusst/smartAfter-frontend.git
+cd smartAfter-frontend
 
-This will:
-1. ✅ Check prerequisites
-2. 🐍 Set up Python backend with virtual environment
-3. ⚛️ Install Node.js dependencies
-4. 🚀 Start both servers simultaneously
-
-### Manual Setup
-
-#### Backend (Python FastAPI)
-```bash
-cd pdf-parser-backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python start_server.py
-```
-
-#### Frontend (Next.js)
-```bash
-cd smartafter-next
+# Install dependencies
 npm install
+
+# Set up environment variables
+cp env.example .env.local
+# Edit .env.local with your credentials
+
+# Run development server
 npm run dev
 ```
 
-## 🌐 Access Points
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **PDF Analyzer**: http://localhost:3000/pdf-analyzer
-
-## 🔧 Features
-
-### PDF Processing
-- **Multi-format Support**: Handles various PDF types including scanned documents
-- **OCR Integration**: Extracts text from image-based PDFs
-- **Batch Processing**: Process multiple PDFs simultaneously
-- **URL Processing**: Extract data from PDF URLs
-
-### Warranty Analysis
-- **Smart Detection**: Automatically identifies warranty information
-- **Expiry Warnings**: Alerts for warranties expiring within 30 days
-- **Risk Assessment**: Low/Medium/High risk categorization
-- **Recommendations**: Actionable insights and next steps
-- **Contact Extraction**: Finds warranty contact information
-
-### Data Extraction
-- **Invoice Data**: Vendor, amount, date, invoice number, products, taxes
-- **Warranty Details**: Period, terms, status, expiry dates
-- **Refund Information**: Amount, reason, status, method
-- **Product Information**: Names, descriptions, quantities, prices
-
-## 📡 API Endpoints
-
-### Core Endpoints
-- `POST /api/pdf-parser/parse` - Parse single PDF
-- `POST /api/pdf-parser/analyze-warranty` - Analyze warranty information
-- `POST /api/pdf-parser/batch-analyze` - Batch warranty analysis
-
-### Backend Endpoints
-- `POST /parse-pdf` - Parse PDF with full data extraction
-- `POST /analyze-warranty` - Warranty-specific analysis
-- `POST /batch-warranty-analysis` - Process multiple PDFs
-- `GET /health` - Health check
-- `GET /supported-formats` - Supported formats and capabilities
-
-## 🛠️ Development
-
-### Project Structure
-
-#### Frontend (`smartafter-next/`)
-```
-app/
-├── api/pdf-parser/          # API routes
-│   ├── parse/route.ts
-│   ├── analyze-warranty/route.ts
-│   └── batch-analyze/route.ts
-├── components/              # React components
-│   └── PDFWarrantyAnalyzer.tsx
-├── lib/                    # Utilities
-│   ├── pdfParserService.ts
-│   └── ...
-└── pdf-analyzer/           # PDF analyzer page
-    └── page.tsx
-```
-
-#### Backend (`pdf-parser-backend/`)
-```
-├── main.py                 # FastAPI application
-├── pdf_parser.py          # PDF parsing logic
-├── data_extractor.py      # Data extraction & analysis
-├── models.py              # Pydantic models
-├── requirements.txt       # Python dependencies
-├── start_server.py        # Startup script
-└── test_api.py           # API testing script
-```
-
-### Adding New Features
-
-#### Frontend
-1. **New Components**: Add to `app/components/`
-2. **API Routes**: Add to `app/api/`
-3. **Pages**: Add to `app/` directory
-4. **Services**: Add to `app/lib/`
-
-#### Backend
-1. **New Models**: Add to `models.py`
-2. **Extraction Logic**: Extend `data_extractor.py`
-3. **API Endpoints**: Add to `main.py`
-4. **PDF Processing**: Enhance `pdf_parser.py`
-
-### Testing
-
-#### Backend Testing
+### Backend (Python FastAPI)
 ```bash
-cd pdf-parser-backend
-python test_api.py
+# Clone the backend repository
+git clone https://github.com/Wanderlusst/prod-smartAfter.git
+cd prod-smartAfter/pdf-parser-backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run development server
+python main.py
 ```
 
-#### Frontend Testing
+## 🔧 Environment Variables
+
+### Frontend (.env.local)
+```env
+NEXTAUTH_SECRET=your-nextauth-secret
+NEXTAUTH_URL=https://smart-after-frontend.vercel.app
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+### Backend (.env)
+```env
+SUPABASE_URL=your-supabase-url
+SUPABASE_KEY=your-supabase-key
+GEMINI_API_KEY=your-gemini-api-key
+REDIS_HOST=your-redis-host
+REDIS_PORT=your-redis-port
+REDIS_PASSWORD=your-redis-password
+```
+
+## 📁 Project Structure
+
+### Frontend
+```
+smartAfter-frontend/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── components/        # React components
+│   ├── dashboard/         # Dashboard pages
+│   ├── landing/           # Landing page
+│   └── lib/              # Utility functions
+├── auth.ts               # NextAuth configuration
+├── middleware.ts         # Next.js middleware
+└── package.json          # Dependencies
+```
+
+### Backend
+```
+prod-smartAfter/
+├── pdf-parser-backend/   # Python FastAPI backend
+│   ├── main.py          # FastAPI application
+│   ├── models.py        # Data models
+│   ├── pdf_parser.py    # PDF parsing logic
+│   └── requirements.txt # Python dependencies
+└── smartafter-next/     # Next.js frontend (legacy)
+```
+
+## 🔄 Deployment Status
+
+### Frontend Deployment
+- **Platform**: Vercel
+- **URL**: https://smart-after-frontend.vercel.app
+- **Auto-deploy**: ✅ Enabled (pushes to main branch)
+- **Last Deploy**: [Check Vercel Dashboard](https://vercel.com/dashboard)
+
+### Backend Deployment
+- **Platform**: Render
+- **URL**: https://pdf-parser-backend.onrender.com
+- **Auto-deploy**: ✅ Enabled (pushes to main branch)
+- **Last Deploy**: [Check Render Dashboard](https://dashboard.render.com)
+
+## 🛠️ Recent Fixes
+
+### Redirect Loop Fix (Latest)
+- **Issue**: Landing page redirect loop with callbackUrl parameter
+- **Files Changed**: 
+  - `auth.ts` - Fixed NextAuth redirect callback
+  - `middleware.ts` - Added /landing to matcher
+  - `app/landing/page.tsx` - Added delay to prevent race conditions
+- **Status**: ✅ Deployed
+
+### Build Errors Fix
+- **Issue**: TypeScript errors and ESLint warnings
+- **Files Changed**: Multiple API routes and components
+- **Status**: ✅ Deployed
+
+## 🧪 Testing
+
+### Frontend Testing
 ```bash
-cd smartafter-next
-npm run test
+# Run type checking
+npm run type-check
+
+# Run linting
+npm run lint
+
+# Run build test
+npm run build
 ```
 
-## 🔧 Configuration
+### Backend Testing
+```bash
+# Run tests
+python -m pytest
 
-### Environment Variables
-
-#### Frontend (`.env.local`)
-```env
-PDF_PARSER_BACKEND_URL=http://localhost:8000
-NEXT_PUBLIC_API_URL=http://localhost:8000
+# Test API endpoints
+curl https://pdf-parser-backend.onrender.com/health
 ```
 
-#### Backend (`.env`)
-```env
-DEBUG=True
-LOG_LEVEL=INFO
-```
+## 📊 Features
 
-### CORS Configuration
-Backend is configured to allow requests from:
-- http://localhost:3000 (Next.js dev server)
-- http://localhost:3001 (Alternative port)
+- 🔐 **Google OAuth Integration** - Secure email access
+- 📧 **Gmail API Integration** - Automatic receipt detection
+- 🤖 **AI-Powered Parsing** - Gemini AI for data extraction
+- 📊 **Dashboard Analytics** - Spending insights and trends
+- ⏰ **Smart Alerts** - Return deadlines and warranty reminders
+- 🔄 **Real-time Sync** - Background processing for emails
 
-## 📦 Deployment
-
-### Docker Deployment
-
-#### Backend Dockerfile
-```dockerfile
-FROM python:3.9-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-#### Frontend Dockerfile
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-### Production Considerations
-- Set up proper environment variables
-- Configure CORS for production domains
-- Add authentication/authorization
-- Set up logging and monitoring
-- Implement file size limits
-- Add rate limiting
-
-## 🐛 Troubleshooting
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-#### Backend Issues
-1. **Port 8000 in use**
-   ```bash
-   lsof -ti:8000 | xargs kill -9
-   ```
+1. **Redirect Loop**: Fixed in latest deployment
+2. **Build Errors**: All TypeScript errors resolved
+3. **Environment Variables**: Ensure all required vars are set
+4. **CORS Issues**: Backend has proper CORS configuration
 
-2. **Python dependencies**
-   ```bash
-   cd pdf-parser-backend
-   pip install -r requirements.txt
-   ```
+### Debug Commands
+```bash
+# Check frontend logs
+vercel logs
 
-3. **OCR not working**
-   - Install Tesseract: `brew install tesseract` (macOS)
-   - Or: `sudo apt-get install tesseract-ocr` (Ubuntu)
+# Check backend logs
+# Visit Render dashboard for logs
 
-#### Frontend Issues
-1. **Port 3000 in use**
-   ```bash
-   lsof -ti:3000 | xargs kill -9
-   ```
+# Test API connectivity
+curl -X GET https://pdf-parser-backend.onrender.com/health
+```
 
-2. **Node modules issues**
-   ```bash
-   cd smartafter-next
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
+## 📞 Support
 
-3. **API connection issues**
-   - Check if backend is running on port 8000
-   - Verify CORS configuration
-   - Check network connectivity
-
-### Logs
-- **Backend**: Check console output for detailed logs
-- **Frontend**: Check browser console and terminal output
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is part of the SmartAfter application suite.
-
-## 🆘 Support
-
-For issues and questions:
-1. Check the troubleshooting section
-2. Review the API documentation at http://localhost:8000/docs
-3. Check the console logs for error messages
-4. Create an issue in the repository
+- **Frontend Issues**: Check [Vercel Dashboard](https://vercel.com/dashboard)
+- **Backend Issues**: Check [Render Dashboard](https://dashboard.render.com)
+- **Code Issues**: Create GitHub issues in respective repositories
 
 ---
 
-**Happy Coding! 🚀**
-# SmartAf - Smart After Purchase Management
-# Force Vercel Refresh - Mon Oct 13 09:21:11 IST 2025
-# Trigger Vercel deployment
-Last updated: Mon Oct 13 16:11:17 IST 2025
+**Last Updated**: $(date)
+**Version**: 1.0.0
+**Status**: 🟢 Production Ready
