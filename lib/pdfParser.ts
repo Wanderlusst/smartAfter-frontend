@@ -176,7 +176,7 @@ export class PDFParser {
         processingTime
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       const processingTime = Date.now() - startTime;
 
       return {
@@ -236,7 +236,7 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
         data: validatedData
       };
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       
       return {
         success: false,
@@ -274,7 +274,7 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
         rawText
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error.message
@@ -453,7 +453,7 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
    * Validate and enhance parsed invoice data
    */
   private validateAndEnhanceInvoiceData(
-    data: any,
+    data: Record<string, unknown>,
     emailContext?: { subject: string; from: string; body: string }
   ): ParsedInvoice {
     // Ensure required fields exist with proper types
@@ -470,7 +470,7 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
       warrantyPeriod: data.warrantyPeriod ? Number(data.warrantyPeriod) : undefined,
       warrantyEndDate: data.warrantyEndDate ? String(data.warrantyEndDate) : undefined,
       category: String(data.category || 'Other'),
-      items: Array.isArray(data.items) ? data.items.map((item: any) => ({
+      items: Array.isArray(data.items) ? data.items.map((item: Record<string, unknown>) => ({
         name: String(item.name || 'Unknown Item'),
         description: String(item.description || ''),
         quantity: Number(item.quantity) || 1,
