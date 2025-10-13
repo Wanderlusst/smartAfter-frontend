@@ -194,8 +194,8 @@ curl -X GET https://pdf-parser-backend.onrender.com/health
 ---
 
 **Last Updated**: $(date)
-**Version**: 1.0.3
+**Version**: 1.0.4
 **Status**: 🟢 Production Ready
 **Cache Bust**: $(date +%s)
 **Deployment**: $(date +%Y%m%d%H%M%S)
-**Final Fix**: TypeScript errors resolved, aggressive cache busting enabled
+**Backend Fix**: Environment variables configured for PDF parser backend
