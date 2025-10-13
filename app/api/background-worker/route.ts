@@ -78,7 +78,7 @@ function isCreditCardStatement(subject: string, from: string): boolean {
 }
 
 // Background worker function
-async function processEmailsInBackground(jobId: string, gmail: unknown, days: number = 90) {
+async function processEmailsInBackground(jobId: string, gmail: any, days: number = 90) {
   try {
     console.log(`🚀 Starting background email processing for ${days} days...`);
     
@@ -96,7 +96,7 @@ async function processEmailsInBackground(jobId: string, gmail: unknown, days: nu
     // Enhanced query for better invoice detection - EXCLUDING credit card statements
     const query = `in:inbox newer_than:${days}d (invoice OR receipt OR bill OR payment OR order OR booking OR ticket OR confirmation OR "thank you for your order" OR "order confirmation" OR "payment receipt" OR "booking confirmation" OR "ticket confirmation" OR "delivery confirmation" OR "purchase confirmation") -from:facebook.com -from:myntra.com -from:zomato.com -from:naukri.com -from:microsoft.com -subject:"notification" -subject:"commented" -subject:"posted" -subject:"shared" -subject:"sale" -subject:"offer" -subject:"promotion" -subject:"credit card" -subject:"statement" -subject:"bank" -subject:"card statement" -subject:"credit card statement" -from:*bank* -from:*card* -from:*credit*`;
     
-    const listRes = await gmail.users.messages.list({
+    const listRes = await (gmail as any).users.messages.list({
       userId: 'me',
       q: query,
       maxResults: 500, // Process more emails for 3 months
@@ -135,7 +135,7 @@ async function processEmailsInBackground(jobId: string, gmail: unknown, days: nu
       const batchPromises = batch.map(async (message: { id: string }) => {
         try {
           // Get full message details
-          const fullRes = await gmail.users.messages.get({
+          const fullRes = await (gmail as any).users.messages.get({
             userId: 'me',
             id: message.id,
             format: 'full'
@@ -285,7 +285,7 @@ function getEmailBody(payload: { body?: { data?: string }; parts?: Array<{ mimeT
   return '';
 }
 
-async function extractPdfAttachments(gmail: unknown, messageId: string, payload: { mimeType?: string; filename?: string; body?: { attachmentId?: string }; parts?: unknown[] }): Promise<Array<{ filename: string; attachmentId: string; mimeType: string; data: string } | null>> {
+async function extractPdfAttachments(gmail: any, messageId: string, payload: { mimeType?: string; filename?: string; body?: { attachmentId?: string }; parts?: unknown[] }): Promise<Array<{ filename: string; attachmentId: string; mimeType: string; data: string } | null>> {
   const attachments: Array<{ filename: string; attachmentId: string }> = [];
   
   if (!payload) return attachments;
@@ -308,7 +308,7 @@ async function extractPdfAttachments(gmail: unknown, messageId: string, payload:
   // Download attachment data
   const attachmentPromises = attachments.map(async (attachment) => {
     try {
-      const attachmentResponse = await gmail.users.messages.attachments.get({
+      const attachmentResponse = await (gmail as any).users.messages.attachments.get({
         userId: 'me',
         messageId: messageId,
         id: attachment.attachmentId
