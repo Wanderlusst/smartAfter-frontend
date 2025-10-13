@@ -39,3 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+smartafter-next/.next/
+smartafter-next/node_modules/
