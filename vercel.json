@@ -1,5 +1,6 @@
 {
   "buildCommand": "npm run build",
+  "comment": "Updated to trigger deployment with redirect fixes",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "functions": {
