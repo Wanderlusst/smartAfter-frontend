@@ -35,6 +35,10 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   manifest: '/manifest.json',
+  other: {
+    'cache-bust': APP_VERSION,
+    'build-time': new Date().toISOString(),
+  }
 }
 
 export const viewport: Viewport = {
@@ -43,14 +47,6 @@ export const viewport: Viewport = {
   themeColor: '#3b82f6',
 }
 
-// Add cache busting meta tags
-export const generateMetadata = () => ({
-  ...metadata,
-  other: {
-    'cache-bust': APP_VERSION,
-    'build-time': new Date().toISOString(),
-  }
-})
 
 export default async function RootLayout({
   children,
