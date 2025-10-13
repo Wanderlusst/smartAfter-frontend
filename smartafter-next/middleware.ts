@@ -45,7 +45,8 @@ export const config = {
     '/warranties/:path*',
     '/documents/:path*',
     '/settings/:path*',
-    // Also run on root to handle redirects
+    // Also run on root and landing to handle redirects
     '/',
+    '/landing',
   ],
 };

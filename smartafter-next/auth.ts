@@ -140,7 +140,20 @@ export const authOptions: NextAuthOptions = {
     },
     // Add redirect callback to handle post-auth flow
     async redirect({ url, baseUrl }) {
-      // After successful auth, redirect to dashboard instead of landing
+      // If URL contains a callbackUrl parameter, use it
+      if (url.includes('callbackUrl=')) {
+        try {
+          const urlObj = new URL(url);
+          const callbackUrl = urlObj.searchParams.get('callbackUrl');
+          if (callbackUrl) {
+            return `${baseUrl}${callbackUrl}`;
+          }
+        } catch (error) {
+          console.error('Error parsing callbackUrl:', error);
+        }
+      }
+      
+      // Default to dashboard if no callbackUrl
       if (url.startsWith(baseUrl)) {
         return `${baseUrl}/dashboard`;
       }

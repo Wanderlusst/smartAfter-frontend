@@ -128,7 +128,13 @@ const Landing = () => {
       const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
       
       console.log('🔄 Redirecting authenticated user to:', callbackUrl);
-      router.push(callbackUrl);
+      
+      // Add a small delay to prevent race conditions
+      const redirectTimer = setTimeout(() => {
+        router.push(callbackUrl);
+      }, 100);
+      
+      return () => clearTimeout(redirectTimer);
     }
   }, [session, status, router]);
 
