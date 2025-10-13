@@ -296,8 +296,8 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
       const cleanText = text.replace(/[^\x20-\x7E\s]/g, ' ').replace(/\s+/g, ' ');
       
       return cleanText.substring(0, 5000); // Limit to first 5000 characters
-    } catch (error) {
-      
+    } catch {
+      console.log('Error extracting text from PDF');
       return '';
     }
   }
@@ -354,7 +354,7 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
             purchaseDate = parsedDate.toISOString().split('T')[0];
             break;
           }
-        } catch (e) {
+        } catch {
           // Continue to next pattern
         }
       }
@@ -547,11 +547,11 @@ Body Preview: ${emailContext.body.substring(0, 500)}...`;
       
       const result = await model.generateContent(testPrompt);
       const response = await result.response;
-      const textResponse = response.text();
+      await response.text(); // Test the response
 
       return true;
-    } catch (error) {
-      
+    } catch {
+      console.log('Error checking backend health');
       return false;
     }
   }
