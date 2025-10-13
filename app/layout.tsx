@@ -8,6 +8,9 @@ import { LoadingProvider } from './contexts/LoadingContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
+// Cache busting version
+const APP_VERSION = Date.now().toString();
+
 export const metadata: Metadata = {
   title: 'SmartAfter - AI-Powered Analytics',
   description: 'SmartAfter - Your intelligent financial companion for smart spending, refunds, and warranty management',
@@ -39,6 +42,15 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: '#3b82f6',
 }
+
+// Add cache busting meta tags
+export const generateMetadata = () => ({
+  ...metadata,
+  other: {
+    'cache-bust': APP_VERSION,
+    'build-time': new Date().toISOString(),
+  }
+})
 
 export default async function RootLayout({
   children,

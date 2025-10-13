@@ -5,6 +5,9 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { forceClearSession } from '../lib/utils';
 
+// Cache busting version
+const CACHE_BUST = Date.now().toString();
+
 const Landing = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -123,6 +126,22 @@ const Landing = () => {
   // Handle redirect to dashboard when authenticated
   useEffect(() => {
     console.log('🔍 Landing page useEffect - session:', !!session, 'status:', status);
+    console.log('🚀 Cache bust version:', CACHE_BUST);
+    
+    // Force clear any cached data
+    if (typeof window !== 'undefined') {
+      // Clear all possible caches
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+          console.log('🧹 Cleared all caches');
+        });
+      }
+      
+      // Clear localStorage
+      localStorage.clear();
+      console.log('🧹 Cleared localStorage');
+    }
     
     if (session && status === 'authenticated') {
       // Get callback URL from query params
@@ -135,7 +154,8 @@ const Landing = () => {
       // Add a small delay to prevent race conditions
       const redirectTimer = setTimeout(() => {
         console.log('⏰ Timer fired, redirecting to:', callbackUrl);
-        router.push(callbackUrl);
+        // Force a hard navigation to bypass any cache
+        window.location.href = callbackUrl;
       }, 100);
       
       return () => {
