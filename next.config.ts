@@ -5,8 +5,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // Enable modern features for better performance
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion'],
-    // Fix NextAuth module resolution issues
-    esmExternals: 'loose',
     // PERFORMANCE: Enable faster route transitions
     optimizeCss: true,
     scrollRestoration: true,

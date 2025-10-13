@@ -14,3 +14,9 @@ export default async function Home() {
   // If not authenticated, redirect to landing page
   redirect('/landing');
 }
+
+// Add metadata to ensure this is recognized as a page
+export const metadata = {
+  title: 'SmartAfter - Redirecting...',
+  description: 'SmartAfter - Your intelligent financial companion',
+};
