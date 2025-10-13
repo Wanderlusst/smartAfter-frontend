@@ -22,8 +22,8 @@ try {
     useFallback = false;
   });
 
-  redis.on('error', (error) => {
-    
+  redis.on('error', () => {
+    console.log('Redis connection error, falling back to in-memory cache');
     useFallback = true;
   });
 
@@ -32,8 +32,8 @@ try {
     useFallback = true;
   });
 
-} catch (error) {
-  
+} catch {
+  console.log('Redis initialization failed, using in-memory cache');
   useFallback = true;
 }
 
@@ -54,8 +54,8 @@ export async function getCachedData<T>(key: string): Promise<T | null> {
   try {
     const cached = await redis.get(key);
     return cached ? JSON.parse(cached) : null;
-  } catch (error) {
-    
+  } catch {
+    console.log('Redis get error, falling back to in-memory cache');
     useFallback = true;
     return getFallbackCache<T>(key);
   }
@@ -68,8 +68,8 @@ export async function setCachedData<T>(key: string, data: T, ttlSeconds: number 
 
   try {
     await redis.setex(key, ttlSeconds, JSON.stringify(data));
-  } catch (error) {
-    
+  } catch {
+    console.log('Redis set error, falling back to in-memory cache');
     useFallback = true;
     await setFallbackCache<T>(key, data, ttlSeconds);
   }
@@ -83,8 +83,8 @@ export async function deleteCachedData(key: string): Promise<void> {
   try {
     await redis.del(key);
     
-  } catch (error) {
-    
+  } catch {
+    console.log('Redis delete error, falling back to in-memory cache');
     useFallback = true;
     await deleteFallbackCache(key);
   }
@@ -98,8 +98,8 @@ export async function clearAllCache(): Promise<void> {
   try {
     await redis.flushdb();
     
-  } catch (error) {
-    
+  } catch {
+    console.log('Redis clear error, falling back to in-memory cache');
     useFallback = true;
     await clearFallbackCache();
   }

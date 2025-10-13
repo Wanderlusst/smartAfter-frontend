@@ -71,7 +71,7 @@ export interface GmailData {
 }
 
 export class SupabaseSyncService {
-  private supabase: any;
+  private supabase: ReturnType<typeof createServerClient>;
 
   constructor() {
     this.supabase = createServerClient();
@@ -216,7 +216,7 @@ export class SupabaseSyncService {
   }
 
   // Store documents in Supabase
-  private async storeDocuments(userId: string, documents: any): Promise<void> {
+  private async storeDocuments(userId: string, documents: { total: number; [key: string]: unknown }): Promise<void> {
     // For now, we'll store document summary
     // You can extend this to store individual documents if needed
     const documentData = {
