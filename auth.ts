@@ -140,23 +140,30 @@ export const authOptions: NextAuthOptions = {
     },
     // Add redirect callback to handle post-auth flow
     async redirect({ url, baseUrl }) {
+      console.log('🔄 NextAuth redirect called with:', { url, baseUrl });
+      
       // If URL contains a callbackUrl parameter, use it
       if (url.includes('callbackUrl=')) {
         try {
           const urlObj = new URL(url);
           const callbackUrl = urlObj.searchParams.get('callbackUrl');
+          console.log('🎯 Found callbackUrl:', callbackUrl);
           if (callbackUrl) {
-            return `${baseUrl}${callbackUrl}`;
+            const redirectUrl = `${baseUrl}${callbackUrl}`;
+            console.log('✅ Redirecting to:', redirectUrl);
+            return redirectUrl;
           }
         } catch (error) {
-          console.error('Error parsing callbackUrl:', error);
+          console.error('❌ Error parsing callbackUrl:', error);
         }
       }
       
       // Default to dashboard if no callbackUrl
       if (url.startsWith(baseUrl)) {
+        console.log('🏠 Default redirect to dashboard');
         return `${baseUrl}/dashboard`;
       }
+      console.log('🌐 External redirect to:', url);
       return url;
     }
   },

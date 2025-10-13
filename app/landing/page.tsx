@@ -122,19 +122,26 @@ const Landing = () => {
 
   // Handle redirect to dashboard when authenticated
   useEffect(() => {
+    console.log('🔍 Landing page useEffect - session:', !!session, 'status:', status);
+    
     if (session && status === 'authenticated') {
       // Get callback URL from query params
       const urlParams = new URLSearchParams(window.location.search);
       const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
       
       console.log('🔄 Redirecting authenticated user to:', callbackUrl);
+      console.log('🔍 Current URL:', window.location.href);
       
       // Add a small delay to prevent race conditions
       const redirectTimer = setTimeout(() => {
+        console.log('⏰ Timer fired, redirecting to:', callbackUrl);
         router.push(callbackUrl);
       }, 100);
       
-      return () => clearTimeout(redirectTimer);
+      return () => {
+        console.log('🧹 Cleaning up redirect timer');
+        clearTimeout(redirectTimer);
+      };
     }
   }, [session, status, router]);
 

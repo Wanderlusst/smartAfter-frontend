@@ -194,5 +194,6 @@ curl -X GET https://pdf-parser-backend.onrender.com/health
 ---
 
 **Last Updated**: $(date)
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: 🟢 Production Ready
+**Cache Bust**: $(date +%s)
