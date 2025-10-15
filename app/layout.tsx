@@ -54,8 +54,14 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   // Get session server-side - import authOptions dynamically to avoid client-side issues
-  const { authOptions } = await import('@/auth');
-  const session = await getServerSession(authOptions);
+  let session = null;
+  try {
+    const { authOptions } = await import('@/auth');
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error('Error getting session:', error);
+    session = null;
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -82,9 +88,15 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <LoadingProvider>
-            <ClientLayoutWrapper fontClass={inter.className} session={session}>
-              {children}
-            </ClientLayoutWrapper>
+            {ClientLayoutWrapper ? (
+              <ClientLayoutWrapper fontClass={inter.className} session={session}>
+                {children}
+              </ClientLayoutWrapper>
+            ) : (
+              <div className={inter.className}>
+                {children}
+              </div>
+            )}
           </LoadingProvider>
         </ThemeProvider>
       </body>

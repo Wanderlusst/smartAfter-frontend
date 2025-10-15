@@ -207,7 +207,7 @@ function AuthenticatedLayout({ children, fontClass, session }: ClientLayoutWrapp
   );
 }
 
-export default function ClientLayoutWrapper({ children, fontClass, session }: ClientLayoutWrapperProps) {
+function ClientLayoutWrapper({ children, fontClass, session }: ClientLayoutWrapperProps) {
   return (
     <SessionProvider session={session}>
       <SidebarProvider>
@@ -217,4 +217,6 @@ export default function ClientLayoutWrapper({ children, fontClass, session }: Cl
       </SidebarProvider>
     </SessionProvider>
   );
-} 
+}
+
+export default ClientLayoutWrapper; 

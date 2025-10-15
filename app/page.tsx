@@ -17,6 +17,6 @@ export default async function Home() {
 
 // Add metadata to ensure this is recognized as a page
 export const metadata = {
-  title: 'SmartAfter - Redirecting...',
+  title: 'SmartAfter - Home',
   description: 'SmartAfter - Your intelligent financial companion',
 };

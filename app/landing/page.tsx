@@ -123,45 +123,15 @@ const Landing = () => {
     );
   }
 
-  // Handle redirect to dashboard when authenticated
+  // Handle redirect to dashboard when authenticated - SIMPLIFIED
   useEffect(() => {
-    console.log('🔍 Landing page useEffect - session:', !!session, 'status:', status);
-    console.log('🚀 Cache bust version:', CACHE_BUST);
-    
-    // Force clear any cached data
-    if (typeof window !== 'undefined') {
-      // Clear all possible caches
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-          console.log('🧹 Cleared all caches');
-        });
-      }
-      
-      // Clear localStorage
-      localStorage.clear();
-      console.log('🧹 Cleared localStorage');
-    }
-    
     if (session && status === 'authenticated') {
       // Get callback URL from query params
       const urlParams = new URLSearchParams(window.location.search);
       const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
       
-      console.log('🔄 Redirecting authenticated user to:', callbackUrl);
-      console.log('🔍 Current URL:', window.location.href);
-      
-      // Add a small delay to prevent race conditions
-      const redirectTimer = setTimeout(() => {
-        console.log('⏰ Timer fired, redirecting to:', callbackUrl);
-        // Force a hard navigation to bypass any cache
-        window.location.href = callbackUrl;
-      }, 100);
-      
-      return () => {
-        console.log('🧹 Cleaning up redirect timer');
-        clearTimeout(redirectTimer);
-      };
+      // Simple redirect without delays or cache clearing
+      router.push(callbackUrl);
     }
   }, [session, status, router]);
 
@@ -171,7 +141,7 @@ const Landing = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/40 to-emerald-50/30 dark:from-slate-950 dark:via-slate-900/90 dark:to-slate-800/80 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Redirecting to dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );

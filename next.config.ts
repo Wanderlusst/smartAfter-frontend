@@ -46,15 +46,8 @@ const nextConfig: NextConfig = {
         'node-domexception': false,
       };
       
-      // Exclude server-only modules from client bundle
-      config.externals = config.externals || [];
-      config.externals.push({
-        'googleapis': 'commonjs googleapis',
-        'googleapis-common': 'commonjs googleapis-common',
-        'gaxios': 'commonjs gaxios',
-        'https-proxy-agent': 'commonjs https-proxy-agent',
-        'agent-base': 'commonjs agent-base',
-      });
+      // FIXED: Properly handle externals for client-side
+      // Don't use externals on client-side, they're for server-side only
       
       // PERFORMANCE: Optimize for faster route switching
       config.optimization = {
@@ -93,11 +86,17 @@ const nextConfig: NextConfig = {
           minSize: 20000,
         },
       };
+    } else {
+      // Server-side externals - properly configured
+      config.externals = [
+        ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
+        'googleapis',
+        'googleapis-common',
+        'gaxios',
+        'https-proxy-agent',
+        'agent-base',
+      ];
     }
-
-
-    // PERFORMANCE: Remove duplicate optimization config
-    // The optimization is already configured above for both dev and prod
 
     // Optimize SVG imports
     config.module.rules.push({
@@ -166,16 +165,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirects for better SEO
-  async redirects() {
-    return [
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
-    ];
-  },
+  // Redirects removed to prevent redirect loops
 
   // Environment variables
   env: {
@@ -185,17 +175,11 @@ const nextConfig: NextConfig = {
 
   // TypeScript configuration
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
     ignoreBuildErrors: true,
   },
 
   // ESLint configuration
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
 };

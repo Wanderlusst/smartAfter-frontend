@@ -24,7 +24,9 @@ export class CacheService {
 
   private constructor() {
     // No longer loading from localStorage - using Supabase for persistence
-    console.log('📦 CacheService initialized - using Supabase for persistence');
+    if (typeof window !== 'undefined') {
+      console.log('📦 CacheService initialized - using Supabase for persistence');
+    }
   }
 
   static getInstance(): CacheService {
@@ -53,7 +55,9 @@ export class CacheService {
 
   // Public methods
   setData(data: Partial<CacheData>): void {
-    console.log('📝 setData called with:', data);
+    if (typeof window !== 'undefined') {
+      console.log('📝 setData called with:', data);
+    }
     
     // Ensure documents is always an array
     const documents = 
@@ -73,12 +77,14 @@ export class CacheService {
       timestamp: Date.now()
     };
 
-    console.log('📝 Cache updated:', { 
-      documentsCount: this.cache.documents.length,
-      purchasesCount: this.cache.purchases.length,
-      totalSpent: this.cache.totalSpent,
-      hasInitialData: this.cache.hasInitialData
-    });
+    if (typeof window !== 'undefined') {
+      console.log('📝 Cache updated:', { 
+        documentsCount: this.cache.documents.length,
+        purchasesCount: this.cache.purchases.length,
+        totalSpent: this.cache.totalSpent,
+        hasInitialData: this.cache.hasInitialData
+      });
+    }
 
     // No longer saving to localStorage - data is persisted in Supabase
     this.notifyListeners();
@@ -90,19 +96,25 @@ export class CacheService {
 
   getDocuments(): any[] {
     const documents = this.cache?.documents;
-    console.log('📄 getDocuments() called, cache:', this.cache);
-    console.log('📄 documents from cache:', documents);
-    console.log('📄 type of documents:', typeof documents, Array.isArray(documents));
+    if (typeof window !== 'undefined') {
+      console.log('📄 getDocuments() called, cache:', this.cache);
+      console.log('📄 documents from cache:', documents);
+      console.log('📄 type of documents:', typeof documents, Array.isArray(documents));
+    }
     
     // Ensure we always return an array
     if (Array.isArray(documents)) {
       return documents;
     } else if (documents && typeof documents === 'object') {
       // If it's an object but not an array, try to convert it
-      console.log('⚠️ documents is not an array, attempting conversion');
+      if (typeof window !== 'undefined') {
+        console.log('⚠️ documents is not an array, attempting conversion');
+      }
       return Object.values(documents);
     } else {
-      console.log('⚠️ documents is not an array, returning empty array');
+      if (typeof window !== 'undefined') {
+        console.log('⚠️ documents is not an array, returning empty array');
+      }
       return [];
     }
   }
@@ -132,12 +144,16 @@ export class CacheService {
 
   // Update specific data
   updateDocuments(documents: any[]): void {
-    console.log('📄 updateDocuments called with:', documents.length, 'documents');
-    console.log('📄 Type of documents:', typeof documents, Array.isArray(documents));
+    if (typeof window !== 'undefined') {
+      console.log('📄 updateDocuments called with:', documents.length, 'documents');
+      console.log('📄 Type of documents:', typeof documents, Array.isArray(documents));
+    }
     
     // Ensure documents is an array
     const safeDocuments = Array.isArray(documents) ? documents : [];
-    console.log('📄 Safe documents count:', safeDocuments.length);
+    if (typeof window !== 'undefined') {
+      console.log('📄 Safe documents count:', safeDocuments.length);
+    }
     
     this.setData({ documents: safeDocuments });
   }
@@ -152,35 +168,49 @@ export class CacheService {
 
   // Merge new documents with existing ones
   addDocuments(newDocuments: any[]): void {
-    console.log('📥 CacheService.addDocuments called with:', newDocuments);
-    console.log('📥 Type of newDocuments:', typeof newDocuments, Array.isArray(newDocuments));
-    console.log('📥 Current cache state:', this.cache);
+    if (typeof window !== 'undefined') {
+      console.log('📥 CacheService.addDocuments called with:', newDocuments);
+      console.log('📥 Type of newDocuments:', typeof newDocuments, Array.isArray(newDocuments));
+      console.log('📥 Current cache state:', this.cache);
+    }
     
     // Ensure newDocuments is always an array
     const safeNewDocuments = Array.isArray(newDocuments) ? newDocuments : [];
-    console.log('📥 Safe new documents count:', safeNewDocuments.length);
+    if (typeof window !== 'undefined') {
+      console.log('📥 Safe new documents count:', safeNewDocuments.length);
+    }
     
     if (safeNewDocuments.length === 0) {
-      console.log('📥 No documents to add, returning early');
+      if (typeof window !== 'undefined') {
+        console.log('📥 No documents to add, returning early');
+      }
       return;
     }
     
     const existingDocuments = this.getDocuments();
-    console.log('📥 Existing documents from getDocuments():', existingDocuments);
-    console.log('📥 Type of existingDocuments:', typeof existingDocuments, Array.isArray(existingDocuments));
+    if (typeof window !== 'undefined') {
+      console.log('📥 Existing documents from getDocuments():', existingDocuments);
+      console.log('📥 Type of existingDocuments:', typeof existingDocuments, Array.isArray(existingDocuments));
+    }
     
     // Ensure existingDocuments is always an array
     const safeExistingDocuments = Array.isArray(existingDocuments) ? existingDocuments : [];
-    console.log('📥 Safe existing documents:', safeExistingDocuments.length);
+    if (typeof window !== 'undefined') {
+      console.log('📥 Safe existing documents:', safeExistingDocuments.length);
+    }
     
     const existingIds = new Set(safeExistingDocuments.map(doc => doc.id));
     const uniqueNewDocuments = safeNewDocuments.filter(doc => !existingIds.has(doc.id));
     
-    console.log('📥 Unique new documents to add:', uniqueNewDocuments.length);
+    if (typeof window !== 'undefined') {
+      console.log('📥 Unique new documents to add:', uniqueNewDocuments.length);
+    }
     
     if (uniqueNewDocuments.length > 0) {
       const updatedDocuments = [...uniqueNewDocuments, ...safeExistingDocuments];
-      console.log('📥 Updated documents count:', updatedDocuments.length);
+      if (typeof window !== 'undefined') {
+        console.log('📥 Updated documents count:', updatedDocuments.length);
+      }
       
       this.updateDocuments(updatedDocuments);
       
@@ -193,9 +223,13 @@ export class CacheService {
       }, 0);
       
       this.updateTotalSpent(totalSpent);
-      console.log('📥 Cache updated successfully with total spent:', totalSpent);
+      if (typeof window !== 'undefined') {
+        console.log('📥 Cache updated successfully with total spent:', totalSpent);
+      }
     } else {
-      console.log('📥 No new documents to add - all are duplicates');
+      if (typeof window !== 'undefined') {
+        console.log('📥 No new documents to add - all are duplicates');
+      }
     }
   }
 }
