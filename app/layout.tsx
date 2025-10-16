@@ -7,6 +7,7 @@ import SessionProviderWrapper from './components/SessionProviderWrapper'
 import { SidebarProvider } from './components/SidebarContext'
 import AppSidebar from './components/Sidebar'
 import { Toaster } from './components/ui/sonner'
+import ConditionalLayout from './components/ConditionalLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -82,15 +83,10 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <SidebarProvider>
-              <div className="flex h-screen overflow-hidden">
-                <AppSidebar />
-                <main className="flex-1 overflow-y-auto bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
-                  {children}
-                </main>
-              </div>
-              <Toaster />
-            </SidebarProvider>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+            <Toaster />
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>
