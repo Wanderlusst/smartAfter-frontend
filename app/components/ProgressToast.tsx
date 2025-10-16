@@ -23,6 +23,11 @@ export default function ProgressToast() {
         const data = await response.json();
         console.log('🍞 ProgressToast - API data:', data);
         
+        // Skip processing if no active sync and we already have the last state
+        if (!data.isActive && lastProgress && !lastProgress.isActive) {
+          return;
+        }
+        
         // Only show toast if status changed or progress updated significantly
         if (data.isActive && data.status === 'syncing') {
           if (!lastProgress || lastProgress.status !== 'syncing' || Math.abs(data.progress - (lastProgress.progress || 0)) > 10) {
@@ -80,11 +85,11 @@ export default function ProgressToast() {
     // Check initial status
     checkProgress();
     
-    // Check every 2 seconds
-    const interval = setInterval(checkProgress, 2000);
+    // Check every 5 seconds (reduced frequency)
+    const interval = setInterval(checkProgress, 5000);
 
     return () => clearInterval(interval);
-  }, [lastProgress]);
+  }, []); // Remove lastProgress from dependencies to prevent infinite loops
 
   // This component doesn't render anything - it just manages toasts
   return null;
