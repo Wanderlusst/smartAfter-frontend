@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { 
   User, 
   Bell, 
@@ -17,7 +18,10 @@ import {
   Trash2,
   Save,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  LogOut,
+  RefreshCw,
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 export default function Settings() {
@@ -25,6 +29,15 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [notificationSettings, setNotificationSettings] = useState({
+    newPurchase: true,
+    warrantyExpiry: true,
+    refundUpdates: true,
+    weeklySummary: true,
+    securityAlerts: true
+  });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isReauthing, setIsReauthing] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -42,15 +55,66 @@ export default function Settings() {
     setIsSaving(true);
     setSaveStatus('idle');
     
-    // Simulate save operation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsSaving(false);
-    setSaveStatus('success');
-    
-    // Reset status after 3 seconds
-    setTimeout(() => setSaveStatus('idle'), 3000);
+    try {
+      // Save notification settings to localStorage
+      localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSaveStatus('success');
+      toast.success('Settings saved successfully!');
+    } catch (error) {
+      setSaveStatus('error');
+      toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
   };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({ 
+        callbackUrl: '/landing',
+        redirect: true 
+      });
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Failed to logout');
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleReauth = async () => {
+    setIsReauthing(true);
+    try {
+      // Force re-authentication by signing out and redirecting to login
+      await signOut({ 
+        callbackUrl: '/api/auth/signin?callbackUrl=/settings',
+        redirect: true 
+      });
+    } catch (error) {
+      toast.error('Failed to re-authenticate');
+      setIsReauthing(false);
+    }
+  };
+
+  const handleNotificationChange = (key: string, value: boolean) => {
+    setNotificationSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Load settings on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('notificationSettings');
+    if (savedSettings) {
+      setNotificationSettings(JSON.parse(savedSettings));
+    }
+  }, []);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -122,11 +186,11 @@ export default function Settings() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Email Notifications</h3>
               <div className="space-y-4">
                 {[
-                  { label: 'New purchase detected', description: 'Get notified when new receipts are found' },
-                  { label: 'Warranty expiry alerts', description: 'Reminders before warranties expire' },
-                  { label: 'Refund status updates', description: 'Updates on refund processing' },
-                  { label: 'Weekly spending summary', description: 'Weekly overview of your spending' },
-                  { label: 'Security alerts', description: 'Important security notifications' },
+                  { key: 'newPurchase', label: 'New purchase detected', description: 'Get notified when new receipts are found' },
+                  { key: 'warrantyExpiry', label: 'Warranty expiry alerts', description: 'Reminders before warranties expire' },
+                  { key: 'refundUpdates', label: 'Refund status updates', description: 'Updates on refund processing' },
+                  { key: 'weeklySummary', label: 'Weekly spending summary', description: 'Weekly overview of your spending' },
+                  { key: 'securityAlerts', label: 'Security alerts', description: 'Important security notifications' },
                 ].map((item, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div>
@@ -134,7 +198,12 @@ export default function Settings() {
                       <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" defaultChecked className="sr-only peer" />
+                      <input 
+                        type="checkbox" 
+                        checked={notificationSettings[item.key as keyof typeof notificationSettings]}
+                        onChange={(e) => handleNotificationChange(item.key, e.target.checked)}
+                        className="sr-only peer" 
+                      />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
@@ -167,6 +236,59 @@ export default function Settings() {
                   </div>
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                     Enable
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Account Actions */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Account Actions</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white">Re-authenticate</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Sign in again to refresh your session</div>
+                  </div>
+                  <button 
+                    onClick={handleReauth}
+                    disabled={isReauthing}
+                    className="flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isReauthing ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Re-authenticating...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Re-authenticate
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white">Sign Out</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Sign out of your account</div>
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isLoggingOut ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Signing out...
+                      </>
+                    ) : (
+                      <>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -294,8 +416,36 @@ export default function Settings() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and preferences</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and preferences</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Signed in as</div>
+                <div className="font-medium text-gray-900 dark:text-white">{session.user.email}</div>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleReauth}
+                  disabled={isReauthing}
+                  className="flex items-center px-3 py-2 text-sm bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 rounded-md hover:bg-yellow-200 dark:hover:bg-yellow-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-1 ${isReauthing ? 'animate-spin' : ''}`} />
+                  Reauth
+                </button>
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="flex items-center px-3 py-2 text-sm bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
