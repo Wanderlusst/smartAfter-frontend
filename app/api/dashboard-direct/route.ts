@@ -212,8 +212,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '7');
-    const maxResults = parseInt(searchParams.get('maxResults') || '50');
+    const days = parseInt(searchParams.get('days') || '90'); // Default to 3 months for background processing
+    const maxResults = parseInt(searchParams.get('maxResults') || '200'); // Increased for 3-month data
     const forceRefresh = searchParams.get('forceRefresh') === 'true';
 
     console.log(`🚀 Starting smart email fetch for ${days} days with ${maxResults} max results (forceRefresh: ${forceRefresh})`);
@@ -241,6 +241,23 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('📧 Cached data not available or stale, fetching fresh Gmail data with BACKEND ENHANCED processing...');
+
+    // Set background progress to active
+    try {
+      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/background-progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isActive: true,
+          progress: 0,
+          message: 'Starting 3-month data sync...',
+          status: 'syncing',
+          documentsFound: 0
+        })
+      });
+    } catch (error) {
+      console.log('Could not update progress status:', error);
+    }
 
     // Process emails directly with backend integration (no internal API call needed)
     const gmail = await getGmailClient();
@@ -285,6 +302,23 @@ export async function GET(request: NextRequest) {
     let processed = 0;
     let backendProcessed = 0;
     
+    // Update progress - processing emails
+    try {
+      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/background-progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isActive: true,
+          progress: 30,
+          message: `Processing ${messages.length} emails from 3 months...`,
+          status: 'syncing',
+          documentsFound: 0
+        })
+      });
+    } catch (error) {
+      console.log('Could not update progress status:', error);
+    }
+
     // Process emails with backend integration
     const concurrency = 3; // Reduced for backend processing
     let index = 0;
@@ -466,6 +500,23 @@ export async function GET(request: NextRequest) {
       console.log('✅ Data successfully stored in Supabase');
     } else {
       console.log('⚠️ Failed to store data in Supabase, but continuing with Gmail data');
+    }
+
+    // Update progress - completed
+    try {
+      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/background-progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isActive: false,
+          progress: 100,
+          message: `Completed - ${documents.length} documents processed`,
+          status: 'success',
+          documentsFound: documents.length
+        })
+      });
+    } catch (error) {
+      console.log('Could not update progress status:', error);
     }
 
     console.log('📊 FINAL API RESPONSE:', {

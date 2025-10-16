@@ -2,14 +2,13 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from 'next-themes'
-import ClientLayoutWrapper from './components/ClientLayoutWrapper'
 import { getServerSession } from 'next-auth'
-import { LoadingProvider } from './contexts/LoadingContext'
+import SessionProviderWrapper from './components/SessionProviderWrapper'
+import { SidebarProvider } from './components/SidebarContext'
+import AppSidebar from './components/Sidebar'
+import { Toaster } from './components/ui/sonner'
 
 const inter = Inter({ subsets: ['latin'] })
-
-// Cache busting version
-const APP_VERSION = Date.now().toString();
 
 export const metadata: Metadata = {
   title: 'SmartAfter - AI-Powered Analytics',
@@ -34,11 +33,6 @@ export const metadata: Metadata = {
     ],
     shortcut: '/favicon.ico',
   },
-  manifest: '/manifest.json',
-  other: {
-    'cache-bust': APP_VERSION,
-    'build-time': new Date().toISOString(),
-  }
 }
 
 export const viewport: Viewport = {
@@ -81,25 +75,28 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
       </head>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <LoadingProvider>
-            {ClientLayoutWrapper ? (
-              <ClientLayoutWrapper fontClass={inter.className} session={session}>
-                {children}
-              </ClientLayoutWrapper>
-            ) : (
-              <div className={inter.className}>
-                {children}
+        <SessionProviderWrapper session={session}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              <div className="flex h-screen overflow-hidden">
+                <AppSidebar />
+                <main className="flex-1 overflow-y-auto">
+                  {children}
+                </main>
               </div>
-            )}
-          </LoadingProvider>
-        </ThemeProvider>
+              <Toaster />
+            </SidebarProvider>
+          </ThemeProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   )
 }
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';

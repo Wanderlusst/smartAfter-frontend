@@ -1,31 +1,24 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Performance optimizations
+  // Clean experimental configuration
   experimental: {
-    // Enable modern features for better performance
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion'],
-    // PERFORMANCE: Enable faster route transitions
-    scrollRestoration: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 
-  // Image optimization
+  // Image optimization - simplified
   images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    formats: ['image/webp'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
-  // Compression and optimization
+  // Basic optimizations only
   compress: true,
   poweredByHeader: false,
-  generateEtags: false,
 
-  // Bundle optimization
-  webpack: (config, { dev, isServer }) => {
+  // Simplified webpack configuration
+  webpack: (config, { isServer }) => {
     // Fix Node.js modules in browser
     if (!isServer) {
       config.resolve.fallback = {
@@ -43,51 +36,9 @@ const nextConfig: NextConfig = {
         os: false,
         path: false,
         worker_threads: false,
-        'node-domexception': false,
-      };
-      
-      // FIXED: Properly handle externals for client-side
-      // Don't use externals on client-side, they're for server-side only
-      
-      // PERFORMANCE: Optimize for faster route switching
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            framework: {
-              chunks: 'all',
-              name: 'framework',
-              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-              priority: 40,
-              enforce: true,
-            },
-            lib: {
-              test(module: any) {
-                return module.size() > 160000 && /node_modules[/\\]/.test(module.identifier());
-              },
-              name: 'lib',
-              priority: 30,
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-            commons: {
-              name: 'commons',
-              minChunks: 2,
-              priority: 20,
-            },
-            shared: {
-              name: false,
-              priority: 10,
-              reuseExistingChunk: true,
-            },
-          },
-          maxInitialRequests: 25,
-          minSize: 20000,
-        },
       };
     } else {
-      // Server-side externals - properly configured
+      // Server-side externals
       config.externals = [
         ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
         'googleapis',
@@ -98,20 +49,26 @@ const nextConfig: NextConfig = {
       ];
     }
 
-    // Optimize SVG imports
+    // SVG imports
+    const fileLoaderRule = config.module.rules.find((rule: any) => rule.test?.test?.('.svg'));
+    if (fileLoaderRule) {
+      fileLoaderRule.exclude = /\.svg$/i;
+    }
+    
     config.module.rules.push({
-      test: /\.svg$/,
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
     });
 
     return config;
   },
 
-  // Headers for better caching
+  // Production-ready headers - NO aggressive cache busting
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/:path*',
         headers: [
           {
             key: 'X-Content-Type-Options',
@@ -125,36 +82,19 @@ const nextConfig: NextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
-          // AGGRESSIVE CACHE BUSTING
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0',
-          },
-          {
-            key: 'Pragma',
-            value: 'no-cache',
-          },
-          {
-            key: 'Expires',
-            value: '0',
-          },
-          {
-            key: 'Last-Modified',
-            value: new Date().toUTCString(),
-          },
         ],
       },
       {
-        source: '/api/(.*)',
+        source: '/api/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=600',
+            value: 'no-store, max-age=0',
           },
         ],
       },
       {
-        source: '/static/(.*)',
+        source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
@@ -163,14 +103,6 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
-  },
-
-  // Redirects removed to prevent redirect loops
-
-  // Environment variables
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 
   // TypeScript configuration

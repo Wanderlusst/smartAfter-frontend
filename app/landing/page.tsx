@@ -1,57 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { forceClearSession } from '../lib/utils';
 
 // Cache busting version
 const CACHE_BUST = Date.now().toString();
 
 const Landing = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState('');
   const [isClearingSession, setIsClearingSession] = useState(false);
 
-  // Only clear session if explicitly requested via URL parameter
+  // Simple cleanup effect
   useEffect(() => {
-    const clearSessionIfNeeded = async () => {
-      // Only clear session if there's an explicit clear request
-      const shouldClear = new URLSearchParams(window.location.search).get('clear') === 'true';
-      
-      if (shouldClear && (status === 'authenticated' || (session && Object.keys(session).length > 0))) {
-        console.log('🧹 Clearing session as requested');
-        setIsClearingSession(true);
-        
-        try {
-          // First try NextAuth signOut
-          await signOut({ 
-            callbackUrl: '/landing',
-            redirect: false 
-          });
-          
-          // Then force clear all stored data
-          forceClearSession();
-          
-        } catch (error) {
-          console.error('Error clearing session:', error);
-          // Fallback: force clear anyway
-          forceClearSession();
-        } finally {
-          setIsClearingSession(false);
-        }
-      }
-    };
-
-    // Run immediately and also when status changes
-    clearSessionIfNeeded();
-  }, [session, status]);
-
-  // Additional cleanup effect that runs immediately on mount
-  useEffect(() => {
-    // Only clear data if explicitly requested via URL parameter
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const shouldClear = urlParams.get('clear') === 'true';
@@ -68,7 +31,7 @@ const Landing = () => {
         localStorage.removeItem('next-auth.callback-url');
       }
     }
-  }, []); // Empty dependency array = runs once on mount
+  }, []);
 
   const handleConnectGmail = async () => {
     setIsConnecting(true);
@@ -109,39 +72,13 @@ const Landing = () => {
     }
   };
 
-  // Show loading only while clearing session or if status is loading
-  if (isClearingSession || status === 'loading') {
+  // Show loading only while clearing session
+  if (isClearingSession) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/40 to-emerald-50/30 dark:from-slate-950 dark:via-slate-900/90 dark:to-slate-800/80 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">
-            {isClearingSession ? 'Clearing session...' : 'Loading...'}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle redirect to dashboard when authenticated - SIMPLIFIED
-  useEffect(() => {
-    if (session && status === 'authenticated') {
-      // Get callback URL from query params
-      const urlParams = new URLSearchParams(window.location.search);
-      const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
-      
-      // Simple redirect without delays or cache clearing
-      router.push(callbackUrl);
-    }
-  }, [session, status, router]);
-
-  // If user is already authenticated, show loading while redirecting
-  if (session && status === 'authenticated') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/40 to-emerald-50/30 dark:from-slate-950 dark:via-slate-900/90 dark:to-slate-800/80 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-300">Clearing session...</p>
         </div>
       </div>
     );

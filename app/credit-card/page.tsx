@@ -22,3 +22,6 @@ export default function CreditCardPage() {
     </div>
   );
 }
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';

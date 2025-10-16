@@ -1,21 +1,16 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function DebugRedirect() {
-  const { data: session, status } = useSession();
+function DebugContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [debugInfo, setDebugInfo] = useState<any>({});
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
     const info = {
-      session: !!session,
-      status,
-      userEmail: session?.user?.email,
-      callbackUrl: searchParams.get('callbackUrl'),
+      callbackUrl: urlParams.get('callbackUrl'),
       currentUrl: window.location.href,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
@@ -23,10 +18,11 @@ export default function DebugRedirect() {
     
     setDebugInfo(info);
     console.log('🐛 Debug Redirect Info:', info);
-  }, [session, status, searchParams]);
+  }, []);
 
   const handleForceRedirect = () => {
-    const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+    const urlParams = new URLSearchParams(window.location.search);
+    const callbackUrl = urlParams.get('callbackUrl') || '/dashboard';
     console.log('🚀 Force redirecting to:', callbackUrl);
     router.push(callbackUrl);
   };
@@ -102,3 +98,12 @@ export default function DebugRedirect() {
     </div>
   );
 }
+
+export default function DebugRedirect() {
+  return (
+    <Suspense fallback={<div>Loading debug page...</div>}>
+      <DebugContent />
+    </Suspense>
+  );
+}
+

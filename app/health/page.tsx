@@ -14,3 +14,6 @@ export const metadata = {
   title: 'SmartAfter - Health Check',
   description: 'Application health status',
 };
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';

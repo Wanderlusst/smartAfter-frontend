@@ -15,4 +15,7 @@ const NotFound = () => {
   );
 };
 
-export default NotFound; 
+export default NotFound;
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'; 

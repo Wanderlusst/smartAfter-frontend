@@ -16,13 +16,13 @@ import Header from '../components/Header';
 import { useDataStore } from '@/app/stores/dataStore';
 import { useDocuments } from '@/app/hooks/useDocuments';
 import { useLoading } from '@/app/contexts/LoadingContext';
-import DashboardProgressBar from '@/app/components/DashboardProgressBar';
+import ProgressToast from '@/app/components/ProgressToast';
 import ClientBackgroundProcessor from '@/app/components/ClientBackgroundProcessor';
 import BackgroundSyncIndicator from '@/app/components/BackgroundSyncIndicator';
 import { cacheService } from '@/app/lib/cacheService';
 import { dataSyncService } from '@/app/lib/dataSyncService';
 import { databaseSyncService } from '@/app/lib/databaseSyncService';
-import { useOptimizedNavigation } from '@/app/lib/routePerformance';
+import { useOptimizedNavigation } from '@/app/lib/routeTransitions';
 import RouteLoadingIndicator, { FullScreenLoadingOverlay } from '@/app/components/RouteLoadingIndicator';
 
 // Helper function to get PROPER last 7 days date for Gmail search
@@ -54,7 +54,7 @@ export default function DashboardClient({ session, initialData, initialEmails }:
   const { setLoading } = useLoading();
   
   // Add optimized navigation for performance
-  const { loadingState, currentRoute, isNavigating } = useOptimizedNavigation();
+  const { navigate, prefetchAndNavigate, preloadRoute, preloadRoutes } = useOptimizedNavigation();
   
   // Use centralized data store
   const { 
@@ -841,33 +841,13 @@ export default function DashboardClient({ session, initialData, initialEmails }:
     <>
       <Header />
       <ClientBackgroundProcessor />
-      <BackgroundSyncIndicator />
+      <ProgressToast />
       <DashboardLayout>
         <div className="space-y-6">
         {/* Dashboard Content */}
         <div className="space-y-6">
           {/* Loading state is now handled by the header loading indicator */}
           
-          {/* Background Progress Bar */}
-          <DashboardProgressBar />
-          
-          {/* Data Source Indicator */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  Data Source: {dashboardData.source || 'unknown'}
-                </span>
-                <span className="text-xs text-blue-600 dark:text-blue-400">
-                  ({dashboardData.purchaseCount || 0} documents)
-                </span>
-              </div>
-              <div className="text-xs text-blue-600 dark:text-blue-400">
-                {hasCacheData ? '💾 Cache Service Active' : hasBackgroundData ? '💾 Persistent Cache Active' : '📊 API Data'}
-              </div>
-            </div>
-          </div>
 
 
           {/* Dashboard Overview */}
@@ -911,14 +891,14 @@ export default function DashboardClient({ session, initialData, initialEmails }:
 
     {/* Performance Loading Indicators */}
     <RouteLoadingIndicator
-      loadingState={loadingState}
-      currentRoute={currentRoute}
-      isVisible={isNavigating && loadingState !== 'idle'}
+      loadingState="idle"
+      currentRoute=""
+      isVisible={false}
     />
     
     <FullScreenLoadingOverlay
-      loadingState={loadingState}
-      currentRoute={currentRoute}
+      loadingState="idle"
+      currentRoute=""
     />
     </>
   );

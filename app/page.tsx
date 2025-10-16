@@ -20,3 +20,6 @@ export const metadata = {
   title: 'SmartAfter - Home',
   description: 'SmartAfter - Your intelligent financial companion',
 };
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
