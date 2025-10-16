@@ -43,8 +43,8 @@ export default function MinimalProgressBar() {
     // Check initial status
     checkProgress();
     
-    // Check every 2 seconds
-    const interval = setInterval(checkProgress, 2000);
+    // Check every 5 seconds (reduced frequency)
+    const interval = setInterval(checkProgress, 5000);
 
     return () => clearInterval(interval);
   }, []);

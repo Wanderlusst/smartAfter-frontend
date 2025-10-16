@@ -47,8 +47,8 @@ export default function BackgroundSyncIndicator({ className = '' }: BackgroundSy
       }
     };
 
-    // Check every 2 seconds
-    const interval = setInterval(checkBackgroundStatus, 2000);
+    // Check every 5 seconds (reduced frequency)
+    const interval = setInterval(checkBackgroundStatus, 5000);
     
     // Initial check
     checkBackgroundStatus();
