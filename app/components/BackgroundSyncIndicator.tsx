@@ -1,60 +1,15 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-
-interface SyncStatus {
-  isActive: boolean;
-  progress: number;
-  message: string;
-  status: 'idle' | 'syncing' | 'success' | 'error';
-  documentsFound: number;
-  lastSyncTime?: string;
-}
+import { useBackgroundProgress } from '@/app/hooks/useBackgroundProgress';
 
 interface BackgroundSyncIndicatorProps {
   className?: string;
 }
 
 export default function BackgroundSyncIndicator({ className = '' }: BackgroundSyncIndicatorProps) {
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    isActive: false,
-    progress: 0,
-    message: 'Checking for new emails...',
-    status: 'idle',
-    documentsFound: 0
-  });
-
-  useEffect(() => {
-    // Listen for background job updates
-    const checkBackgroundStatus = async () => {
-      try {
-        // Check if background job is running
-        const response = await fetch('/api/background-progress');
-        if (response.ok) {
-          const data = await response.json();
-          setSyncStatus(prev => ({
-            ...prev,
-            isActive: data.isActive || false,
-            progress: data.progress || 0,
-            message: data.message || 'Processing emails...',
-            status: data.status || 'idle',
-            documentsFound: data.documentsFound || 0
-          }));
-        }
-      } catch (error) {
-        console.log('Background status check failed:', error);
-      }
-    };
-
-    // Check every 5 seconds (reduced frequency)
-    const interval = setInterval(checkBackgroundStatus, 5000);
-    
-    // Initial check
-    checkBackgroundStatus();
-
-    return () => clearInterval(interval);
-  }, []);
+  const syncStatus = useBackgroundProgress();
 
   const getStatusIcon = () => {
     switch (syncStatus.status) {

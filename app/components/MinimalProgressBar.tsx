@@ -1,53 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface ProgressData {
-  isActive: boolean;
-  progress: number;
-  documentsFound: number;
-  status: 'idle' | 'syncing' | 'success' | 'error';
-  message: string;
-}
+import { useBackgroundProgress } from '@/app/hooks/useBackgroundProgress';
 
 export default function MinimalProgressBar() {
-  const [progressData, setProgressData] = useState<ProgressData>({
-    isActive: false,
-    progress: 0,
-    documentsFound: 0,
-    status: 'idle',
-    message: ''
-  });
-
-  // Check progress from API
-  const checkProgress = async () => {
-    try {
-      const response = await fetch('/api/background-progress');
-      if (response.ok) {
-        const data = await response.json();
-        setProgressData({
-          isActive: data.isActive || false,
-          progress: data.progress || 0,
-          documentsFound: data.documentsFound || 0,
-          status: data.status || 'idle',
-          message: data.message || ''
-        });
-      }
-    } catch (error) {
-      // Silently fail - don't show errors for background progress
-    }
-  };
-
-  useEffect(() => {
-    // Check initial status
-    checkProgress();
-    
-    // Check every 5 seconds (reduced frequency)
-    const interval = setInterval(checkProgress, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const progressData = useBackgroundProgress();
 
   // Don't show if not active or completed
   if (!progressData.isActive && progressData.status !== 'syncing') {
