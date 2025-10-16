@@ -1,11 +1,17 @@
-# SmartAfter - Intelligent Purchase Management System
+# SmartAfter Frontend - Intelligent Purchase Management System
+
+> **🎯 THIS IS THE FRONTEND REPOSITORY** - Next.js application for SmartAfter
 
 A comprehensive solution for automatically organizing receipts, tracking returns, and managing warranties from your email.
 
+## 📁 Repository Structure
+- **Frontend**: This repository (Next.js + TypeScript)
+- **Backend**: [Wanderlusst/prod-smartAfter](https://github.com/Wanderlusst/prod-smartAfter) (Python FastAPI)
+
 ## 🏗️ Architecture Overview
 
-### Frontend Repository
-- **Repository**: [Wanderlusst/smartAfter-frontend](https://github.com/Wanderlusst/smartAfter-frontend)
+### Frontend Repository (THIS REPO)
+- **Repository**: [Wanderlusst/smartAfter-frontend](https://github.com/Wanderlusst/smartAfter-frontend) ← **YOU ARE HERE**
 - **Deployment**: [smart-after-frontend.vercel.app](https://smart-after-frontend.vercel.app)
 - **Platform**: Vercel
 - **Framework**: Next.js 15 with TypeScript
@@ -20,11 +26,12 @@ A comprehensive solution for automatically organizing receipts, tracking returns
 
 ## 🚀 Quick Start
 
-### Frontend (Next.js)
+### Frontend (Next.js) - THIS REPOSITORY
 ```bash
-# Clone the frontend repository
-git clone https://github.com/Wanderlusst/smartAfter-frontend.git
-cd smartAfter-frontend
+# You're already in the frontend repository!
+# If cloning fresh:
+# git clone https://github.com/Wanderlusst/smartAfter-frontend.git
+# cd smartAfter-frontend
 
 # Install dependencies
 npm install
