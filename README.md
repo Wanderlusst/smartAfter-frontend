@@ -4,10 +4,6 @@
 
 A comprehensive solution for automatically organizing receipts, tracking returns, and managing warranties from your email.
 
-## 📁 Repository Structure
-- **Frontend**: This repository (Next.js + TypeScript)
-- **Backend**: [Wanderlusst/prod-smartAfter](https://github.com/Wanderlusst/prod-smartAfter) (Python FastAPI)
-
 ## 🏗️ Architecture Overview
 
 ### Frontend Repository (THIS REPO)
@@ -15,13 +11,6 @@ A comprehensive solution for automatically organizing receipts, tracking returns
 - **Deployment**: [smart-after-frontend.vercel.app](https://smart-after-frontend.vercel.app)
 - **Platform**: Vercel
 - **Framework**: Next.js 15 with TypeScript
-- **Status**: ✅ Live
-
-### Backend Repository  
-- **Repository**: [Wanderlusst/prod-smartAfter](https://github.com/Wanderlusst/prod-smartAfter)
-- **Deployment**: [pdf-parser-backend.onrender.com](https://pdf-parser-backend.onrender.com)
-- **Platform**: Render
-- **Framework**: Python FastAPI
 - **Status**: ✅ Live
 
 ## 🚀 Quick Start
@@ -46,9 +35,8 @@ npm run dev
 
 ### Backend (Python FastAPI)
 ```bash
-# Clone the backend repository
-git clone https://github.com/Wanderlusst/prod-smartAfter.git
-cd prod-smartAfter/pdf-parser-backend
+# Backend is included in this repository
+cd pdf-parser-backend
 
 # Create virtual environment
 python -m venv venv
@@ -101,13 +89,13 @@ smartAfter-frontend/
 
 ### Backend
 ```
-prod-smartAfter/
-├── pdf-parser-backend/   # Python FastAPI backend
-│   ├── main.py          # FastAPI application
-│   ├── models.py        # Data models
-│   ├── pdf_parser.py    # PDF parsing logic
-│   └── requirements.txt # Python dependencies
-└── smartafter-next/     # Next.js frontend (legacy)
+pdf-parser-backend/       # Python FastAPI backend
+├── main.py              # FastAPI application
+├── models.py            # Data models
+├── pdf_parser.py        # PDF parsing logic
+├── data_extractor.py    # Data extraction logic
+├── custom_parser.py     # Custom parsing logic
+└── requirements.txt     # Python dependencies
 ```
 
 ## 🔄 Deployment Status
@@ -155,6 +143,9 @@ npm run build
 
 ### Backend Testing
 ```bash
+# Navigate to backend directory
+cd pdf-parser-backend
+
 # Run tests
 python -m pytest
 
@@ -196,7 +187,7 @@ curl -X GET https://pdf-parser-backend.onrender.com/health
 
 - **Frontend Issues**: Check [Vercel Dashboard](https://vercel.com/dashboard)
 - **Backend Issues**: Check [Render Dashboard](https://dashboard.render.com)
-- **Code Issues**: Create GitHub issues in respective repositories
+- **Code Issues**: Create GitHub issues in [Wanderlusst/smartAfter-frontend](https://github.com/Wanderlusst/smartAfter-frontend)
 
 ---
 

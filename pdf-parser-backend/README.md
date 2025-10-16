@@ -153,7 +153,7 @@ The API is configured to allow requests from:
 ## Integration with Frontend
 
 ### Next.js Integration
-The backend is designed to work seamlessly with the Next.js frontend:
+The backend is designed to work seamlessly with the Next.js frontend in the same repository:
 
 1. **API Calls**: Frontend makes HTTP requests to backend endpoints
 2. **File Upload**: PDF files are sent as multipart/form-data
