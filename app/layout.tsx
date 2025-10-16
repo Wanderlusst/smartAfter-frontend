@@ -85,7 +85,7 @@ export default async function RootLayout({
             <SidebarProvider>
               <div className="flex h-screen overflow-hidden">
                 <AppSidebar />
-                <main className="flex-1 overflow-y-auto">
+                <main className="flex-1 overflow-y-auto bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
                   {children}
                 </main>
               </div>
