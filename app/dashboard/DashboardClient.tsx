@@ -19,6 +19,8 @@ import { useLoading } from '@/app/contexts/LoadingContext';
 import ProgressToast from '@/app/components/ProgressToast';
 import ClientBackgroundProcessor from '@/app/components/ClientBackgroundProcessor';
 import BackgroundSyncIndicator from '@/app/components/BackgroundSyncIndicator';
+import { useBackgroundProgress } from '@/app/hooks/useBackgroundProgress';
+import { toast } from 'sonner';
 import { cacheService } from '@/app/lib/cacheService';
 import { dataSyncService } from '@/app/lib/dataSyncService';
 import { databaseSyncService } from '@/app/lib/databaseSyncService';
@@ -90,6 +92,47 @@ export default function DashboardClient({ session, initialData, initialEmails }:
   const { data: documentsData } = useDocuments();
   const sharedDocuments = hasDirectGmailData ? [] : (documentsData?.documents || []);
   const documentsSummary = hasDirectGmailData ? { totalAmount: 0, totalDocuments: 0, vendors: 0 } : (documentsData?.summary || { totalAmount: 0, totalDocuments: 0, vendors: 0 });
+
+  // Background progress tracking
+  const backgroundProgress = useBackgroundProgress();
+
+  // Function to trigger 3-month background sync
+  const triggerBackgroundSync = async () => {
+    try {
+      console.log('🚀 Triggering 3-month background sync...');
+      
+      // Show initial toast
+      toast.loading('Starting 3-month data sync...', {
+        description: 'This may take a few minutes',
+        duration: 2000,
+        position: 'bottom-right'
+      });
+
+      // Trigger the background sync via API
+      const response = await fetch('/api/dashboard-direct', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-cache'
+      });
+
+      if (response.ok) {
+        console.log('✅ Background sync triggered successfully');
+        // The progress will be tracked by the useBackgroundProgress hook
+        // and toaster notifications will be shown automatically
+      } else {
+        throw new Error('Failed to trigger background sync');
+      }
+    } catch (error) {
+      console.error('❌ Error triggering background sync:', error);
+      toast.error('Failed to start background sync', {
+        description: 'Please try again later',
+        duration: 5000,
+        position: 'bottom-right'
+      });
+    }
+  };
 
   // CRITICAL: Set initial data immediately when component mounts to avoid empty state
   useEffect(() => {
@@ -855,8 +898,7 @@ export default function DashboardClient({ session, initialData, initialEmails }:
             data={dashboardData}
             initialData={initialData}
             onRefresh={handleManualRefresh}
-            onManualSync={handleManualSync}
-
+            onManualSync={triggerBackgroundSync}
           />
           
           {/* Purchase Breakdown */}
