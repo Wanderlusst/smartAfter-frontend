@@ -12,8 +12,7 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle,
-  Clock,
-  Zap
+  Clock
 } from 'lucide-react';
 import { useDataStore } from '../../stores/dataStore';
 import { GmailConnectionPrompt } from '../GmailConnectionPrompt';
@@ -435,35 +434,6 @@ const DashboardOverview = ({
         </div>
       </div>
 
-      {/* 3-Month Background Sync Section */}
-      <div className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
-        <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
-          <CardContent className="pt-6 pb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-                  <Zap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    3-Month Data Sync
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Sync 3 months of purchase data for comprehensive insights
-                  </p>
-                </div>
-              </div>
-              <Button 
-                onClick={onManualSync}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Start Sync
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Empty State */}
       {currentPurchaseCount === 0 && (
